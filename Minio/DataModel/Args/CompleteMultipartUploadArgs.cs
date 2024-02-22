@@ -19,14 +19,14 @@ using System.Xml.Linq;
 
 namespace Minio.DataModel.Args;
 
-internal class CompleteMultipartUploadArgs : ObjectWriteArgs<CompleteMultipartUploadArgs>
+public class CompleteMultipartUploadArgs : ObjectWriteArgs<CompleteMultipartUploadArgs>
 {
-    internal CompleteMultipartUploadArgs()
+    public CompleteMultipartUploadArgs()
     {
         RequestMethod = HttpMethod.Post;
     }
 
-    internal CompleteMultipartUploadArgs(MultipartCopyUploadArgs args)
+    public CompleteMultipartUploadArgs(MultipartCopyUploadArgs args)
     {
         // destBucketName, destObjectName, metadata, sseHeaders
         RequestMethod = HttpMethod.Post;
@@ -52,13 +52,13 @@ internal class CompleteMultipartUploadArgs : ObjectWriteArgs<CompleteMultipartUp
             throw new InvalidOperationException(nameof(ETags) + " dictionary cannot be empty.");
     }
 
-    internal CompleteMultipartUploadArgs WithUploadId(string uploadId)
+    public CompleteMultipartUploadArgs WithUploadId(string uploadId)
     {
         UploadId = uploadId;
         return this;
     }
 
-    internal CompleteMultipartUploadArgs WithETags(IDictionary<int, string> etags)
+    public CompleteMultipartUploadArgs WithETags(IDictionary<int, string> etags)
     {
         if (etags?.Count > 0) ETags = new Dictionary<int, string>(etags);
         return this;

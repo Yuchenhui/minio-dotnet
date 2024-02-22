@@ -30,7 +30,7 @@ public class PutObjectArgs : ObjectWriteArgs<PutObjectArgs>
         ContentType = "application/octet-stream";
     }
 
-    internal PutObjectArgs(PutObjectPartArgs args)
+    public PutObjectArgs(PutObjectPartArgs args)
     {
         RequestMethod = HttpMethod.Put;
         BucketName = args.BucketName;
@@ -155,13 +155,13 @@ public class PutObjectArgs : ObjectWriteArgs<PutObjectArgs>
         return this;
     }
 
-    internal PutObjectArgs WithUploadId(string id = null)
+    public PutObjectArgs WithUploadId(string id = null)
     {
         UploadId = id;
         return this;
     }
 
-    internal PutObjectArgs WithPartNumber(int num)
+    public PutObjectArgs WithPartNumber(int num)
     {
         PartNumber = num;
         return this;

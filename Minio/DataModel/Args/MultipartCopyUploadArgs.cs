@@ -20,9 +20,9 @@ using Minio.Helper;
 
 namespace Minio.DataModel.Args;
 
-internal class MultipartCopyUploadArgs : ObjectWriteArgs<MultipartCopyUploadArgs>
+public class MultipartCopyUploadArgs : ObjectWriteArgs<MultipartCopyUploadArgs>
 {
-    internal MultipartCopyUploadArgs(CopyObjectArgs args)
+    public MultipartCopyUploadArgs(CopyObjectArgs args)
     {
         if (args is null || args.SourceObject is null)
         {

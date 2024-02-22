@@ -19,7 +19,7 @@ using Minio.Helper;
 
 namespace Minio.DataModel.Args;
 
-internal class NewMultipartUploadCopyArgs : NewMultipartUploadArgs<NewMultipartUploadCopyArgs>
+public class NewMultipartUploadCopyArgs : NewMultipartUploadArgs<NewMultipartUploadCopyArgs>
 {
     internal bool ReplaceMetadataDirective { get; set; }
     internal bool ReplaceTagsDirective { get; set; }

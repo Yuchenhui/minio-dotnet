@@ -18,7 +18,7 @@ using Minio.Helper;
 
 namespace Minio.DataModel.Args;
 
-internal class PutObjectPartArgs : PutObjectArgs
+public class PutObjectPartArgs : PutObjectArgs
 {
     public PutObjectPartArgs()
     {
