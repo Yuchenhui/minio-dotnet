@@ -359,21 +359,57 @@ public interface IObjectOperations
     /// <exception cref="MalFormedXMLException">When configuration XML provided is invalid</exception>
     Task RemoveObjectTagsAsync(RemoveObjectTagsArgs args, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    ///     Start a new multi-part upload request
+    /// </summary>
+    /// <param name="args">
+    ///     NewMultipartUploadPutArgs arguments object encapsulating bucket name, object name, Headers, SSE
+    ///     Headers
+    /// </param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    /// <exception cref="AuthorizationException">When access or secret key is invalid</exception>
+    /// <exception cref="InvalidBucketNameException">When bucket name is invalid</exception>
+    /// <exception cref="InvalidObjectNameException">When object name is invalid</exception>
+    /// <exception cref="BucketNotFoundException">When bucket is not found</exception>
+    /// <exception cref="ObjectNotFoundException">When object is not found</exception>
+    /// <exception cref="AccessDeniedException">For encrypted copy operation, Access is denied if the key is wrong</exception>
     Task<string> NewMultipartUploadAsync(NewMultipartUploadPutArgs args,
         CancellationToken cancellationToken = default);
 
-    Task<string> NewMultipartUploadAsync(NewMultipartUploadCopyArgs args,
-        CancellationToken cancellationToken = default);
-
-    Task<IDictionary<int, string>> PutObjectPartAsync(PutObjectPartArgs args,
-        CancellationToken cancellationToken = default);
-
+    /// <summary>
+    ///     Internal method to complete multi part upload of object to server.
+    /// </summary>
+    /// <param name="args">CompleteMultipartUploadArgs Arguments object with bucket name, object name, upload id, Etags</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    /// <exception cref="AuthorizationException">When access or secret key is invalid</exception>
+    /// <exception cref="InvalidBucketNameException">When bucket name is invalid</exception>
+    /// <exception cref="InvalidObjectNameException">When object name is invalid</exception>
+    /// <exception cref="BucketNotFoundException">When bucket is not found</exception>
+    /// <exception cref="ObjectNotFoundException">When object is not found</exception>
+    /// <exception cref="AccessDeniedException">For encrypted copy operation, Access is denied if the key is wrong</exception>
     Task<PutObjectResponse> CompleteMultipartUploadAsync(CompleteMultipartUploadArgs args,
         CancellationToken cancellationToken = default);
 
-    Task<PutObjectResponse> PutObjectSinglePartAsync(PutObjectArgs args,
-        CancellationToken cancellationToken = default,
-        bool singleFile = false);
+    /// <summary>
+    ///     Upload object part to bucket for particular uploadId
+    /// </summary>
+    /// <param name="args">
+    ///     PutObjectArgs encapsulates bucket name, object name, upload id, part number, object stream data,
+    ///     Headers, SSE Headers
+    /// </param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    /// <exception cref="AuthorizationException">When access or secret key is invalid</exception>
+    /// <exception cref="InvalidBucketNameException">When bucket name is invalid</exception>
+    /// <exception cref="InvalidObjectNameException">When object name is invalid</exception>
+    /// <exception cref="BucketNotFoundException">When bucket is not found</exception>
+    /// <exception cref="ObjectDisposedException">The file stream has been disposed</exception>
+    /// <exception cref="NotSupportedException">The file stream cannot be read from</exception>
+    /// <exception cref="InvalidOperationException">The file stream is currently in a read operation</exception>
+    /// <exception cref="AccessDeniedException">For encrypted PUT operation, Access is denied if the key is wrong</exception>
+    Task<PutObjectResponse> PutObjectPartAsync(PutObjectArgs args,
+        CancellationToken cancellationToken = default);
 
-    Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize);
 }

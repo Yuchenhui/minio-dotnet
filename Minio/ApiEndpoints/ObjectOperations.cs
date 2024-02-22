@@ -889,7 +889,7 @@ public partial class MinioClient : IObjectOperations
     /// <exception cref="NotSupportedException">The file stream cannot be read from</exception>
     /// <exception cref="InvalidOperationException">The file stream is currently in a read operation</exception>
     /// <exception cref="AccessDeniedException">For encrypted PUT operation, Access is denied if the key is wrong</exception>
-    public async Task<IDictionary<int, string>> PutObjectPartAsync(PutObjectPartArgs args,
+    internal async Task<IDictionary<int, string>> PutObjectPartAsync(PutObjectPartArgs args,
         CancellationToken cancellationToken = default)
     {
         args?.Validate();
@@ -1070,7 +1070,7 @@ public partial class MinioClient : IObjectOperations
     /// <exception cref="BucketNotFoundException">When bucket is not found</exception>
     /// <exception cref="ObjectNotFoundException">When object is not found</exception>
     /// <exception cref="AccessDeniedException">For encrypted copy operation, Access is denied if the key is wrong</exception>
-    public async Task<string> NewMultipartUploadAsync(NewMultipartUploadCopyArgs args,
+    private async Task<string> NewMultipartUploadAsync(NewMultipartUploadCopyArgs args,
         CancellationToken cancellationToken = default)
     {
         args?.Validate();
@@ -1126,13 +1126,20 @@ public partial class MinioClient : IObjectOperations
             args.ObjectName);
     }
 
+    public async Task<PutObjectResponse> PutObjectPartAsync(PutObjectArgs args, CancellationToken cancellationToken = default)
+    {
+        var rb = await ReadFullAsync(args.ObjectStreamData, unchecked((int)args.ObjectStreamData.Length)).ConfigureAwait(false);
+        args = args.WithRequestBody(rb);
+        return await PutObjectSinglePartAsync(args, cancellationToken,false).ConfigureAwait(false);
+    }
+
     /// <summary>
     ///     Advances in the stream upto currentPartSize or End of Stream
     /// </summary>
     /// <param name="data"></param>
     /// <param name="currentPartSize"></param>
     /// <returns>bytes read in a byte array</returns>
-    public async Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize)
+    private async Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize)
     {
         Memory<byte> result = new byte[currentPartSize];
         var totalRead = 0;

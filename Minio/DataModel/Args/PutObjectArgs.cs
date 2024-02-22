@@ -30,7 +30,7 @@ public class PutObjectArgs : ObjectWriteArgs<PutObjectArgs>
         ContentType = "application/octet-stream";
     }
 
-    public PutObjectArgs(PutObjectPartArgs args)
+    internal PutObjectArgs(PutObjectPartArgs args)
     {
         RequestMethod = HttpMethod.Put;
         BucketName = args.BucketName;
