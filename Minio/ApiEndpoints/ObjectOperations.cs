@@ -1132,7 +1132,7 @@ public partial class MinioClient : IObjectOperations
     /// <param name="data"></param>
     /// <param name="currentPartSize"></param>
     /// <returns>bytes read in a byte array</returns>
-    internal async Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize)
+    public async Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize)
     {
         Memory<byte> result = new byte[currentPartSize];
         var totalRead = 0;

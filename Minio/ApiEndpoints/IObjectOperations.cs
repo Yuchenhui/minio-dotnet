@@ -374,4 +374,6 @@ public interface IObjectOperations
     Task<PutObjectResponse> PutObjectSinglePartAsync(PutObjectArgs args,
         CancellationToken cancellationToken = default,
         bool singleFile = false);
+
+    Task<ReadOnlyMemory<byte>> ReadFullAsync(Stream data, int currentPartSize);
 }

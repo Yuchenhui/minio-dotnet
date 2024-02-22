@@ -15,6 +15,7 @@
  */
 
 using System.Net;
+using System.Reactive.Linq;
 using Minio;
 using Minio.DataModel.Args;
 
@@ -39,13 +40,18 @@ public static class Program
         var fileName = "123.jpg";
         var nmuArgs = new NewMultipartUploadPutArgs()
             .WithBucket(testBucketName)
+            .WithContentType("application/octet-stream")
             .WithObject(fileName);
-        var uploadId = await minio.NewMultipartUploadAsync(nmuArgs).ConfigureAwait(false);
+        //var uploadId = await minio.NewMultipartUploadAsync(nmuArgs).ConfigureAwait(false);
+        var uploadId = "MTExZDRlZTUtM2UwMC00MjI3LTg0YmUtN2YyMWUyMDgzYzg5LjFhYWU2ZWQ2LTQyZWItNDg5ZS1hMTU4LTA1OTdlN2NiYzgzYw";
         Console.WriteLine($"uploadId:{uploadId}");
+
+
         var filePath = @"C:\123.jpg"; // 图片文件路径
-        var chunkSize = 1024 * 1024; // 分片大小，这里设置为1MB
+        var chunkSize = 1024 * 1024 * 5; // 分片大小，这里设置为1MB
         var partNumber = 1; // 分片索引初始化
         var etags = new Dictionary<int, string>();
+        etags.Add(1,"\"bd60b2de60551dfa3e23553611409930\"");
         using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
             int bytesRead;
@@ -61,14 +67,20 @@ public static class Program
                     buffer = actualBuffer;
                 }
 
-                using (var memoryStream = new MemoryStream(buffer))
-                {
-                    // 调用分片上传方法
-                   var etag = await UploadChunk(minio, uploadId, testBucketName,
-                        fileName, partNumber, bytesRead, memoryStream).ConfigureAwait(false);
-                   etags.Add(partNumber,etag);
+                //if (partNumber == 2)
+                //{
+                //    break;
+                //}
 
-                   Console.WriteLine($"Chunk:{partNumber},{etag}");
+                if (partNumber != 1)
+                {
+                    using var memoryStream = new MemoryStream(buffer);
+                    // 调用分片上传方法
+                    var etag = await UploadChunk(minio, uploadId, testBucketName,
+                        fileName, partNumber, bytesRead, memoryStream).ConfigureAwait(false);
+                    etags.Add(partNumber, etag);
+
+                    Console.WriteLine($"Chunk:{partNumber},{etag}");
                 }
 
                 partNumber++; // 为下一个分片增加索引
@@ -80,36 +92,22 @@ public static class Program
             .WithUploadId(uploadId)
             .WithETags(etags);
         var r = await minio.CompleteMultipartUploadAsync(completeMultipartUploadArgs).ConfigureAwait(false);
-        Console.WriteLine($"Completed:{r.ObjectName}");
+        //Console.WriteLine($"Completed:{r.ObjectName}");
+        //await minio.RemoveIncompleteUploadAsync(new RemoveIncompleteUploadArgs().WithBucket(testBucketName)
+        //    .WithObject(fileName)).ConfigureAwait(false);
 
-        //foreach (var bucket in listBuckets.Buckets)
-        //    Console.WriteLine(bucket.Name + " " + bucket.CreationDateDateTime);
 
-        ////Supply a new bucket name
-        //var bucketName = "mynewbucket";
-        //if (await IsBucketExists(minio, bucketName).ConfigureAwait(false))
-        //{
-        //    var remBuckArgs = new RemoveBucketArgs().WithBucket(bucketName);
-        //    await minio.RemoveBucketAsync(remBuckArgs).ConfigureAwait(false);
-        //}
-
-        //var mkBktArgs = new MakeBucketArgs().WithBucket(bucketName);
-        //await minio.MakeBucketAsync(mkBktArgs).ConfigureAwait(false);
-
-        //var found = await IsBucketExists(minio, bucketName).ConfigureAwait(false);
-        //Console.WriteLine("Bucket exists? = " + found);
-        _ = Console.ReadLine();
     }
     private static async Task<string> UploadChunk(IMinioClient minio,string uploadId,string bucket,string fileName, int partNumber, int chunkSize, MemoryStream chunkStream)
     {
-
+        var r = await minio.ReadFullAsync(chunkStream, chunkSize).ConfigureAwait(false);
         var putObjectPartArgs = new PutObjectArgs()
             .WithBucket(bucket)
             .WithObject(fileName)
             .WithObjectSize(chunkSize)
             .WithUploadId(uploadId)
             .WithPartNumber(partNumber)
-            .WithStreamData(chunkStream);
+            .WithRequestBody(r);
         var resp = await minio.PutObjectSinglePartAsync(putObjectPartArgs).ConfigureAwait(false);
         return resp.Etag;
     }

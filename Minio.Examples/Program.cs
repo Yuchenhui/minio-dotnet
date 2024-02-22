@@ -84,11 +84,11 @@ public static class Program
         }
         else
         {
-            endPoint = "play.min.io";
-            accessKey = "Q3AM3UQ867SPQQA43P2F";
-            secretKey = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG";
-            isSecure = true;
-            port = 443;
+            endPoint = "localhost";
+            accessKey = "admin";
+            secretKey = "admin123";
+            isSecure = false;
+            port = 9000;
         }
 
 #pragma warning disable MA0039 // Do not write your own certificate validation method
